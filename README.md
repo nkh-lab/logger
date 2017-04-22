@@ -1,2 +1,2 @@
 # logger
-To trace and debug a code.
+To trace and debug a source code.
