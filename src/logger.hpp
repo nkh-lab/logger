@@ -6,61 +6,65 @@
 #include <string.h>
 
 /* Logger Settings */
-#define LOGGER_ENNABLED // comment out if logging unnneded
+#define LOG_FUNC_ENNABLED // comment out if FUNC logging unnneded
 
 //Output
 #define LOGGER_OUTPUT COUT // COUT, FILE, CUSTOM
 
 namespace logger {
 
-enum class MsgType
+enum class LogType
 {
     Info,
     Warning,
     Error,
-    Debug
+    Debug,
+    FuncEntry,
+    FuncExit
 };
 
 class Msg
 {
-    std::stringstream streamTolog;
+    std::stringstream StreamTolog;
 
 public:
-    Msg(const MsgType msgType, const char* function, const char* file, const int line);
+    Msg(const LogType logType, const char* function, const char* file, const int line);
 
     ~Msg();
 
     template<typename T>
     Msg& operator << (const T& p)
     {
-       streamTolog << p;
+       StreamTolog << p;
 
        return *this;
     }
-private:
-    const char* getMsgTypeName(const MsgType msgType);
-
 };
 
 class Func
 {
+
 public:
-    Func(){};
+    Func(const LogType logType, const char* function, const char* file, const int line);
 };
 
 }
 
 // Macros to log messages
-#ifdef LOGGER_ENNABLED
+#define LOG_INFO       logger::Msg(logger::LogType::Info,    __FUNCTION__, __FILE__, __LINE__)
+#define LOG_WARNING    logger::Msg(logger::LogType::Warning, __FUNCTION__, __FILE__, __LINE__)
+#define LOG_ERROR      logger::Msg(logger::LogType::Error,   __FUNCTION__, __FILE__, __LINE__)
+#define LOG_DEBUG      logger::Msg(logger::LogType::Debug,   __FUNCTION__, __FILE__, __LINE__)
 
-#define LOG_INFO   logger::Msg(logger::MsgType::Info,    __FUNCTION__, __FILE__, __LINE__)
-#define LOG_WANING logger::Msg(logger::MsgType::Warning, __FUNCTION__, __FILE__, __LINE__)
-#define LOG_ERROR  logger::Msg(logger::MsgType::Error,   __FUNCTION__, __FILE__, __LINE__)
-#define LOG_DEBUG  logger::Msg(logger::MsgType::Debug,   __FUNCTION__, __FILE__, __LINE__)
+#ifdef LOG_FUNC_ENNABLED
+
+#define LOG_FUNC_ENTRY logger::Func(logger::LogType::FuncEntry, __FUNCTION__, __FILE__, __LINE__)
+#define LOG_FUNC_EXIT  logger::Func(logger::LogType::FuncExit,  __FUNCTION__, __FILE__, __LINE__)
 
 #else
 
-// TODO: Needed solution to comment out given line for messages: LOG_INFO, LOG_WARNING ...
+#define LOG_FUNC_ENTRY
+#define LOG_FUNC_EXIT
 
 
 #endif
