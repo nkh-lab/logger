@@ -7,6 +7,7 @@
 
 /* Logger Settings */
 #define LOG_FUNC_ENNABLED // comment out if FUNC logging unnneded
+#define LOG_FUNC_THREAD_ID_ENABLED
 
 //Output
 #define LOGGER_OUTPUT COUT // COUT, FILE, CUSTOM
@@ -57,17 +58,11 @@ public:
 #define LOG_DEBUG      logger::Msg(logger::LogType::Debug,   __FUNCTION__, __FILE__, __LINE__)
 
 #ifdef LOG_FUNC_ENNABLED
-
 #define LOG_FUNC_ENTRY logger::Func(logger::LogType::FuncEntry, __FUNCTION__, __FILE__, __LINE__)
 #define LOG_FUNC_EXIT  logger::Func(logger::LogType::FuncExit,  __FUNCTION__, __FILE__, __LINE__)
-
 #else
-
 #define LOG_FUNC_ENTRY
 #define LOG_FUNC_EXIT
-
-
 #endif
-
 
 #endif

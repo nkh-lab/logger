@@ -1,3 +1,5 @@
+#include <thread>
+
 #include "logger.hpp"
 
 namespace logger {
@@ -32,12 +34,16 @@ Func::Func(const LogType logType, const char* function, const char* file, const 
     std::stringstream streamTolog;
 
 #if LOGGER_OUTPUT == COUT
-
     streamTolog << getMsgTypeName(logType) << " ";
-
 #endif
 
-    streamTolog << " " << getFileNameFromPath(file) << " " << function << "() line " << line << ":\n";
+    streamTolog << " " << getFileNameFromPath(file) << " " << function << "() line " << line << ":";
+
+#ifdef LOG_FUNC_THREAD_ID_ENABLED
+    streamTolog << " ThreadId = " << std::this_thread::get_id();
+#endif
+
+   streamTolog << "\n";
 
 #if LOGGER_OUTPUT == COUT
 
