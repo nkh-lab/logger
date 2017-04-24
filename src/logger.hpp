@@ -44,9 +44,14 @@ public:
 
 class Func
 {
+    char* Function;
+    char* File;
+    int   Line;
 
 public:
-    Func(const LogType logType, const char* function, const char* file, const int line);
+    Func(const char* function, const char* file, const int line);
+    ~Func();
+
 };
 
 }
@@ -58,11 +63,9 @@ public:
 #define LOG_DEBUG      logger::Msg(logger::LogType::Debug,   __FUNCTION__, __FILE__, __LINE__)
 
 #ifdef LOG_FUNC_ENNABLED
-#define LOG_FUNC_ENTRY logger::Func(logger::LogType::FuncEntry, __FUNCTION__, __FILE__, __LINE__)
-#define LOG_FUNC_EXIT  logger::Func(logger::LogType::FuncExit,  __FUNCTION__, __FILE__, __LINE__)
+#define LOG_FUNC logger::Func lf(__FUNCTION__, __FILE__, __LINE__)
 #else
-#define LOG_FUNC_ENTRY
-#define LOG_FUNC_EXIT
+#define LOG_FUNC
 #endif
 
 #endif

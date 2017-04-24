@@ -29,15 +29,19 @@ Msg::~Msg()
 #endif
 }
 
-Func::Func(const LogType logType, const char* function, const char* file, const int line)
+Func::Func(const char* function, const char* file, const int line)
 {
+    Function = (char*)function;
+    File = (char*)getFileNameFromPath(file);
+    Line = line;
+
     std::stringstream streamTolog;
 
 #if LOGGER_OUTPUT == COUT
-    streamTolog << getMsgTypeName(logType) << " ";
+    streamTolog << getMsgTypeName(LogType::FuncEntry) << " ";
 #endif
 
-    streamTolog << " " << getFileNameFromPath(file) << " " << function << "() line " << line << ":";
+    streamTolog << " " << File << " " << Function << "() line " << Line << ":";
 
 #ifdef LOG_FUNC_THREAD_ID_ENABLED
     streamTolog << " ThreadId = " << std::this_thread::get_id();
@@ -50,6 +54,29 @@ Func::Func(const LogType logType, const char* function, const char* file, const 
     std::cout << streamTolog.str();
 
 #endif
+}
+
+Func::~Func()
+{
+    std::stringstream streamTolog;
+
+    #if LOGGER_OUTPUT == COUT
+        streamTolog << getMsgTypeName(LogType::FuncExit) << " ";
+    #endif
+
+        streamTolog << " " << File << " " << Function << "() line " << Line << ":";
+
+    #ifdef LOG_FUNC_THREAD_ID_ENABLED
+        streamTolog << " ThreadId = " << std::this_thread::get_id();
+    #endif
+
+       streamTolog << "\n";
+
+    #if LOGGER_OUTPUT == COUT
+
+        std::cout << streamTolog.str();
+
+    #endif
 }
 
 const char* getMsgTypeName(const LogType logType)

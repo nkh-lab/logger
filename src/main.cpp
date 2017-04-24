@@ -8,7 +8,7 @@ void main_th(void);
 
 int main(void)
 {
-    LOG_FUNC_ENTRY;
+    LOG_FUNC;
 
     std::thread t1(main_th);
     std::thread t2(main_th);
@@ -30,34 +30,24 @@ int main(void)
 
     //t1.detach();
     //t2.detach();
-
-    LOG_FUNC_EXIT;
 }
 
 void test1(void)
 {
-   LOG_FUNC_ENTRY;
-
-   LOG_FUNC_EXIT;
+   LOG_FUNC;
 }
 
 void test2(void)
 {
-   LOG_FUNC_ENTRY;
-
-   LOG_FUNC_EXIT;
+   LOG_FUNC;
 }
 
 void main_th(void)
 {
-    LOG_FUNC_ENTRY;
+    LOG_FUNC;
     for(int i = 0; i < 3; i++)
     {
-
         test2();
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-
     }
-    LOG_FUNC_EXIT;
 }
