@@ -1,18 +1,26 @@
-#include <thread>
-
 #include "logger.hpp"
+#ifdef LOG_FUNC_THREAD_ID_ENABLED
+#include <thread>
+#endif
+#if LOG_OUTPUT == LOG_OUTPUT_IVI
+#include "ivi-logging-config.hpp"
+#endif
 
 namespace logger {
 
 const char* getMsgTypeName(const LogType msgType);
 const char* getFileNameFromPath(const char* path);
 
+#if LOG_OUTPUT == LOG_OUTPUT_IVI
+void logToIvi(const LogType logType, std::string textToLog);
+#endif
+
 Msg::Msg(const LogType logType, const char* function, const char* file, const int line)
 {
-#if LOGGER_OUTPUT == COUT
+    Type = logType;
 
+#if LOG_OUTPUT == LOG_OUTPUT_COUT
     StreamTolog << getMsgTypeName(logType) << " ";
-
 #endif
 
     StreamTolog << " " << getFileNameFromPath(file) << " " << function << "() line " << line << ": ";
@@ -22,11 +30,12 @@ Msg::~Msg()
 {
     StreamTolog << "\n";
 
-#if LOGGER_OUTPUT == COUT
-
+#if LOG_OUTPUT == LOG_OUTPUT_COUT
     std::cout << StreamTolog.str();
-
+#elif LOG_OUTPUT == LOG_OUTPUT_IVI
+    logToIvi(Type, StreamTolog.str());
 #endif
+
 }
 
 Func::Func(const char* function, const char* file, const int line)
@@ -37,7 +46,7 @@ Func::Func(const char* function, const char* file, const int line)
 
     std::stringstream streamTolog;
 
-#if LOGGER_OUTPUT == COUT
+#if LOG_OUTPUT == LOG_OUTPUT_COUT || LOG_OUTPUT == LOG_OUTPUT_IVI
     streamTolog << getMsgTypeName(LogType::FuncEntry) << " ";
 #endif
 
@@ -49,10 +58,10 @@ Func::Func(const char* function, const char* file, const int line)
 
    streamTolog << "\n";
 
-#if LOGGER_OUTPUT == COUT
-
+#if LOG_OUTPUT == LOG_OUTPUT_COUT
     std::cout << streamTolog.str();
-
+#elif LOG_OUTPUT == LOG_OUTPUT_IVI
+    logToIvi(LogType::FuncEntry, streamTolog.str());
 #endif
 }
 
@@ -60,23 +69,23 @@ Func::~Func()
 {
     std::stringstream streamTolog;
 
-    #if LOGGER_OUTPUT == COUT
-        streamTolog << getMsgTypeName(LogType::FuncExit) << " ";
-    #endif
+#if LOG_OUTPUT == LOG_OUTPUT_COUT || LOG_OUTPUT == LOG_OUTPUT_IVI
+    streamTolog << getMsgTypeName(LogType::FuncExit) << " ";
+#endif
 
-        streamTolog << " " << File << " " << Function << "() line " << Line << ":";
+    streamTolog << " " << File << " " << Function << "() line " << Line << ":";
 
-    #ifdef LOG_FUNC_THREAD_ID_ENABLED
-        streamTolog << " ThreadId = " << std::this_thread::get_id();
-    #endif
+#ifdef LOG_FUNC_THREAD_ID_ENABLED
+    streamTolog << " ThreadId = " << std::this_thread::get_id();
+#endif
 
-       streamTolog << "\n";
+    streamTolog << "\n";
 
-    #if LOGGER_OUTPUT == COUT
-
-        std::cout << streamTolog.str();
-
-    #endif
+#if LOG_OUTPUT == LOG_OUTPUT_COUT
+    std::cout << streamTolog.str();
+#elif LOG_OUTPUT == LOG_OUTPUT_IVI
+    logToIvi(LogType::FuncExit, streamTolog.str());
+#endif
 }
 
 const char* getMsgTypeName(const LogType logType)
@@ -85,6 +94,7 @@ const char* getMsgTypeName(const LogType logType)
 
     switch (logType)
     {
+        default:
         case LogType::Debug:
             ret = "LOG_DEBUG     ";
             break;
@@ -108,9 +118,6 @@ const char* getMsgTypeName(const LogType logType)
         case LogType::FuncExit:
             ret = "LOG_FUNC_EXIT ";
             break;
-
-        default:
-            break;
     }
 
     return ret;
@@ -128,5 +135,34 @@ const char* getFileNameFromPath(const char* path)
 
    return (char*)path;
 }
+
+#if LOG_OUTPUT == LOG_OUTPUT_IVI
+void logToIvi(const LogType logType, std::string textToLog)
+{
+    switch (logType)
+    {
+        case LogType::Debug:
+        case LogType::FuncEntry:
+        case LogType::FuncExit:
+            log_debug() << textToLog;
+            break;
+
+        case LogType::Error:
+            log_error() << textToLog;
+            break;
+
+        case LogType::Info:
+            log_info() << textToLog;
+            break;
+
+        case LogType::Warning:
+            log_warning() << textToLog;
+            break;
+
+        default:
+            break;
+    }
+}
+#endif
 
 }

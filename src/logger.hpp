@@ -9,8 +9,13 @@
 #define LOG_FUNC_ENNABLED // comment out if FUNC logging unnneded
 #define LOG_FUNC_THREAD_ID_ENABLED
 
-//Output
-#define LOGGER_OUTPUT COUT // COUT, FILE, CUSTOM
+// Output - COUT, FILE, CUSTOM
+#define LOG_OUTPUT_COUT 0
+#define LOG_OUTPUT_IVI  1
+
+// Unncoment needed
+#define LOG_OUTPUT LOG_OUTPUT_COUT
+//#define LOG_OUTPUT LOG_OUTPUT_IVI
 
 namespace logger {
 
@@ -26,10 +31,20 @@ enum class LogType
 
 class Msg
 {
+    LogType Type;
     std::stringstream StreamTolog;
 
 public:
     Msg(const LogType logType, const char* function, const char* file, const int line);
+
+    // disallow copying
+    Msg(const Msg&) = delete;
+    Msg& operator=(const Msg&) = delete;
+
+
+    // disallow moving
+    Msg(Msg&&) = delete;
+    Msg& operator=(Msg&&) = delete;
 
     ~Msg();
 
@@ -50,8 +65,17 @@ class Func
 
 public:
     Func(const char* function, const char* file, const int line);
-    ~Func();
 
+    // disallow copying
+    Func(const Func&) = delete;
+    Func& operator=(const Func&) = delete;
+
+
+    // disallow moving
+    Func(Func&&) = delete;
+    Func& operator=(Func&&) = delete;
+
+    ~Func();
 };
 
 }
