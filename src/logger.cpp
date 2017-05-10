@@ -1,4 +1,5 @@
 #include "logger.hpp"
+#include <stdarg.h>
 #ifdef LOG_FUNC_THREAD_ID_ENABLED
 #include <thread>
 #endif
@@ -165,4 +166,22 @@ void logToIvi(const LogType logType, std::string textToLog)
 }
 #endif
 
+int logMsg(logger::LogType type, const char* func, const char* file, int line, const char* fmt, ...)
+{
+    const int LOG_BUFFER_SIZE = 256;
+
+    char buffer[LOG_BUFFER_SIZE];
+    va_list args;
+    va_start (args, fmt);
+    vsnprintf (buffer, LOG_BUFFER_SIZE - 1, fmt, args);
+
+    Msg(type, func, getFileNameFromPath(file), line) << buffer;
+
+    va_end (args);
+
+    return 0;
 }
+
+}
+
+

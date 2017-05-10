@@ -78,9 +78,28 @@ public:
     ~Func();
 };
 
+/* Additional Function to Log
+ *
+ * They could be used in MACROS which use ternary operator
+ * e.g.:
+ * #define CHECK(value) (value ? true :  (logger::logMsg(logger::LogType::Error, __FUNCTION__, __FILE__, __LINE__, "Check Error!") && false))
+ *
+ * if (CHECK(false))
+ * {
+ *      ...
+ * }
+ *
+ * Common usage example:
+ *
+ * logger::logMsg(logger::LogType::Info, __FUNCTION__, __FILE__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
+ *
+ */
+
+int logMsg(logger::LogType type, const char* func, const char* file, int line, const char* fmt, ...);
+
 }
 
-// Macros to log messages
+/* Main Macros to Log*/
 #define LOG_INFO       logger::Msg(logger::LogType::Info,    __FUNCTION__, __FILE__, __LINE__)
 #define LOG_WARNING    logger::Msg(logger::LogType::Warning, __FUNCTION__, __FILE__, __LINE__)
 #define LOG_ERROR      logger::Msg(logger::LogType::Error,   __FUNCTION__, __FILE__, __LINE__)
