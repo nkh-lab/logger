@@ -140,29 +140,33 @@ const char* getFileNameFromPath(const char* path)
 #if LOG_OUTPUT == LOG_OUTPUT_IVI
 void logToIvi(const LogType logType, std::string textToLog)
 {
-    switch (logType)
+    try
     {
-        case LogType::Debug:
-        case LogType::FuncEntry:
-        case LogType::FuncExit:
-            log_debug() << textToLog;
-            break;
+        switch (logType)
+        {
+            case LogType::Debug:
+            case LogType::FuncEntry:
+            case LogType::FuncExit:
+                log_debug() << textToLog;
+                break;
 
-        case LogType::Error:
-            log_error() << textToLog;
-            break;
+            case LogType::Error:
+                log_error() << textToLog;
+                break;
 
-        case LogType::Info:
-            log_info() << textToLog;
-            break;
+            case LogType::Info:
+                log_info() << textToLog;
+                break;
 
-        case LogType::Warning:
-            log_warning() << textToLog;
-            break;
+            case LogType::Warning:
+                log_warning() << textToLog;
+                break;
 
-        default:
-            break;
+            default:
+                break;
+        }
     }
+    catch(...){}
 }
 #endif
 

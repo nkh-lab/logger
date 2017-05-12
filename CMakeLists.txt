@@ -9,7 +9,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -Wall")
 # project name e.g. for qt-creator
 set(PROJ_NAME "logger")
 project("${PROJ_NAME}")
-message("****** PROJ_NAME: " ${PROJ_NAME})
+#message("****** PROJ_NAME: " ${PROJ_NAME})
 
 
 #FIND_PACKAGE(PkgConfig)
@@ -26,7 +26,7 @@ file(GLOB SRC_FILES
     "src/*.hpp"
 )
 
-message("****** SRC_FILES: " ${SRC_FILES})
+#message("****** SRC_FILES: " ${SRC_FILES})
 
 #link_directories(${MODULE1_LIBRARY_DIRS})
 

@@ -6,14 +6,14 @@
 #include <string.h>
 
 /* Logger Settings */
-#define LOG_FUNC_ENNABLED // comment out if FUNC logging unnneded
+#define LOG_FUNC_ENNABLED // comment out if FUNC logging unneeded
 #define LOG_FUNC_THREAD_ID_ENABLED
 
 // Output - COUT, FILE, CUSTOM
 #define LOG_OUTPUT_COUT 0
 #define LOG_OUTPUT_IVI  1
 
-// Unncoment needed
+// Uncomment needed
 #define LOG_OUTPUT LOG_OUTPUT_COUT
 //#define LOG_OUTPUT LOG_OUTPUT_IVI
 
