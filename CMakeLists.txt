@@ -1,35 +1,20 @@
 cmake_minimum_required(VERSION 2.8)
 
-# FLAGS:
-# -std=c++11    - c++11 support
-# -Wall         - all warnings
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -Wall")
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
+project(logger CXX)
 
-# project name e.g. for qt-creator
-set(PROJ_NAME "logger")
-project("${PROJ_NAME}")
-#message("****** PROJ_NAME: " ${PROJ_NAME})
-
-
-#FIND_PACKAGE(PkgConfig)
-#PKG_CHECK_MODULES(MODULE1 REQUIRED ivi-logging)
-
-#message("****** MODULE1_LIBRARIES: " ${MODULE1_LIBRARIES})
-#message("****** MODULE1_LIBRARY_DIRS: " ${MODULE1_LIBRARY_DIRS})
-
-
-#include_directories(${MODULE1_INCLUDE_DIRS})
+find_package (Threads)
 
 file(GLOB SRC_FILES
     "src/*.cpp"
     "src/*.hpp"
 )
 
-#message("****** SRC_FILES: " ${SRC_FILES})
+add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES})
 
-#link_directories(${MODULE1_LIBRARY_DIRS})
+target_link_libraries (${CMAKE_PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 
-add_executable("${PROJ_NAME}" ${SRC_FILES})
-
-#target_link_libraries("${PROJ_NAME}" ${MODULE1_LIBRARIES})
