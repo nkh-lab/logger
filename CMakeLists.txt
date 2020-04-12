@@ -9,6 +9,8 @@ project(logger CXX)
 
 find_package (Threads)
 
+include_directories("include")
+
 file(GLOB SRC_FILES
     "src/*.cpp"
     "src/*.hpp"

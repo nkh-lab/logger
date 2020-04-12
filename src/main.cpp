@@ -6,8 +6,6 @@ void test1(void);
 void test2(void);
 void main_th(void);
 
-#define CHECK(value) (value ? true :  (logger::logMsg(logger::LogType::Error, __FUNCTION__, __FILE__, __LINE__, "Check Error!") && false))
-
 int main(void)
 {
     LOG_FUNC;
@@ -25,11 +23,11 @@ int main(void)
 
     logger::logMsg(logger::LogType::Info, __FUNCTION__, __FILE__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
 
-    if (CHECK(false))
+    void* ptr = nullptr;
+    if (CHECK(ptr, "ptr = nullptr"))
     {
 
     }
-
 
     for(int i = 0; i < 3; i++)
     {
