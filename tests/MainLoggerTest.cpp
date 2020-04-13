@@ -1,6 +1,6 @@
 #include <thread>
 
-#include "logger.hpp"
+#include "nkh-lab/logger.hpp"
 
 void test1(void);
 void test2(void);
@@ -8,7 +8,7 @@ void main_th(void);
 
 int main(void)
 {
-    LOG_FUNC;
+    LOG_FNC;
 
     std::thread t1(main_th);
     std::thread t2(main_th);
@@ -16,10 +16,10 @@ int main(void)
     t1.join();
     t2.join();
 
-    LOG_INFO << "Test Info " << 1;
-    LOG_WARNING << "Test Warning " << 2;
-    LOG_ERROR << "Test Error " << 3;
-    LOG_DEBUG << "Test Debug " << 4;
+    LOG_INF << "Test Info " << 1;
+    LOG_WRN << "Test Warning " << 2;
+    LOG_ERR << "Test Error " << 3;
+    LOG_DBG << "Test Debug " << 4;
 
     logger::logMsg(logger::LogType::Info, __FUNCTION__, __FILE__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
 
@@ -42,17 +42,17 @@ int main(void)
 
 void test1(void)
 {
-   LOG_FUNC;
+   LOG_FNC;
 }
 
 void test2(void)
 {
-   LOG_FUNC;
+   LOG_FNC;
 }
 
 void main_th(void)
 {
-    LOG_FUNC;
+    LOG_FNC;
     for(int i = 0; i < 3; i++)
     {
         test2();
