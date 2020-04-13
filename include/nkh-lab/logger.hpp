@@ -1,6 +1,14 @@
 #ifndef NKH_LAB_LOGGER_HPP
 #define NKH_LAB_LOGGER_HPP
 
+#include "logger-msgtype.hpp"
+
+#include <iostream>
+#include <mutex>
+#include <sstream>
+#include <string.h>
+#include <stdarg.h>
+
 /*
  * See logging macros at the end of the file
  */
@@ -21,7 +29,19 @@
 #ifndef LOG_OUTPUT_LOGCAT_DISABLED
 #ifdef ANDROID
 #define LOG_OUTPUT_LOGCAT
+
+#define LOG_OUTPUT_CUSTOM(type, msg) logToLogcat(type, msg)
 #endif
+#endif
+
+#ifdef LOG_OUTPUT_IVI
+#include "logger-ivi.hpp"
+
+#define LOG_OUTPUT_CUSTOM(type, msg) logToIvi(type, msg)
+#endif
+
+#ifndef LOG_OUTPUT_CUSTOM
+#define LOG_OUTPUT_CUSTOM(type, msg)
 #endif
 
 /*
@@ -38,42 +58,23 @@
 #endif
 #endif
 
-#include <iostream>
-#include <mutex>
-#include <sstream>
-#include <string.h>
-#include <stdarg.h>
-
 #ifdef LOG_FUNCTION_ENTER_EXIT_THREAD_ID
 #include <thread>
-#endif
-#ifdef LOG_OUTPUT_IVI
-#include "ivi-logging-config.hpp"
 #endif
 
 namespace logger {
 
 std::mutex gCoutMutex;
 
-enum class LogType
-{
-    Info,
-    Warning,
-    Error,
-    Debug,
-    FuncEntry,
-    FuncExit
-};
-
-inline const char* getMsgTypeName(const LogType logType);
+inline const char* getMsgTypeName(MsgType msgType);
 inline const char* getFileNameFromPath(const char* fileFullPath);
 inline std::string toStrFileFunctionLine(const char* fileName, const char* functionName, size_t line);
 
 class Msg
 {
 public:
-    Msg(LogType logType, const char* fileFullPath, const char* functionName, size_t line) :
-        mType(logType)
+    Msg(MsgType type, const char* fileFullPath, const char* functionName, size_t line) :
+        mType(type)
     {
         if (isAllowedToLog())
             mStreamTolog << toStrFileFunctionLine(getFileNameFromPath(fileFullPath), functionName, line) << " ";
@@ -99,10 +100,8 @@ public:
             }
         #endif
 
-        #ifdef LOG_OUTPUT_IVI
-            logToIvi(mType, StreamTolog.str());
-        #endif
-        }
+            LOG_OUTPUT_CUSTOM(mType, mStreamTolog.str());
+       }
     }
 
     template<typename T>
@@ -117,13 +116,13 @@ private:
     inline bool isAllowedToLog()
     {
     #ifdef NDEBUG
-        if (mType == LogType::Debug) return false;
+        if (mType == MsgType::Debug) return false;
     #endif
         return true;
     }
 
 private:
-    LogType mType;
+    MsgType mType;
     std::stringstream mStreamTolog;
 };
 
@@ -142,13 +141,11 @@ public:
     #ifdef LOG_OUTPUT_COUT
         {
             std::lock_guard<std::mutex> lock(gCoutMutex);
-            std::cout << getMsgTypeName(LogType::FuncEntry) << " " << mStreamTolog.str() << std::endl;
+            std::cout << getMsgTypeName(MsgType::FuncEntry) << " " << mStreamTolog.str() << std::endl;
         }
     #endif
 
-    #ifdef LOG_OUTPUT_IVI
-        logToIvi(LogType::FuncEntry, mStreamTolog.str());
-    #endif
+        LOG_OUTPUT_CUSTOM(MsgType::FuncEntry, mStreamTolog.str());
     }
 
     // disallow copying
@@ -164,25 +161,24 @@ public:
     #ifdef LOG_OUTPUT_COUT
         {
             std::lock_guard<std::mutex> lock(gCoutMutex);
-            std::cout << getMsgTypeName(LogType::FuncExit) << " " << mStreamTolog.str() << std::endl;
+            std::cout << getMsgTypeName(MsgType::FuncExit) << " " << mStreamTolog.str() << std::endl;
         }
     #endif
 
-    #ifdef LOG_OUTPUT_IVI
-        logToIvi(LogType::FuncEntry, mStreamTolog.str());
-    #endif
+        LOG_OUTPUT_CUSTOM(MsgType::FuncExit, mStreamTolog.str());
     }
 
 private:
     std::stringstream mStreamTolog;
 };
 #endif
+
 /* To log format string messages
  *
  * Example:
- * logger::logMsg(logger::LogType::Info, __FUNCTION__, __FILE__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
+ * logger::logMsg(logger::msgType::Info, __FUNCTION__, __FILE__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
  */
-inline void logMsg(logger::LogType type, const char* fileFullPath, const char* functionName, size_t line, const char* fmt, ...)
+inline void logMsg(logger::MsgType type, const char* fileFullPath, const char* functionName, size_t line, const char* fmt, ...)
 {
     const int LOG_BUFFER_SIZE = 256;
 
@@ -196,34 +192,34 @@ inline void logMsg(logger::LogType type, const char* fileFullPath, const char* f
     va_end (args);
 }
 
-inline const char* getMsgTypeName(const LogType logType)
+inline const char* getMsgTypeName(MsgType type)
 {
     const char* ret;
 
-    switch (logType)
+    switch (type)
     {
         default:
-        case LogType::Debug:
+        case MsgType::Debug:
             ret = "LOG_DBG";
             break;
 
-        case LogType::Error:
+        case MsgType::Error:
             ret = "LOG_ERR";
             break;
 
-        case LogType::Info:
+        case MsgType::Info:
             ret = "LOG_INF";
             break;
 
-        case LogType::Warning:
+        case MsgType::Warning:
             ret = "LOG_WRN";
             break;
 
-        case LogType::FuncEntry:
+        case MsgType::FuncEntry:
             ret = "LOG_FEN";
             break;
 
-        case LogType::FuncExit:
+        case MsgType::FuncExit:
             ret = "LOG_FEX";
             break;
     }
@@ -253,48 +249,14 @@ inline std::string toStrFileFunctionLine(const char* fileName, const char* funct
     return streamTolog.str();
 }
 
-#ifdef LOG_OUTPUT_IVI
-void logToIvi(const LogType logType, std::string textToLog)
-{
-    try
-    {
-        switch (logType)
-        {
-            case LogType::Debug:
-            case LogType::FuncEntry:
-            case LogType::FuncExit:
-                log_debug() << textToLog;
-                break;
-
-            case LogType::Error:
-                log_error() << textToLog;
-                break;
-
-            case LogType::Info:
-                log_info() << textToLog;
-                break;
-
-            case LogType::Warning:
-                log_warning() << textToLog;
-                break;
-
-            default:
-                break;
-        }
-    }
-    catch(...){}
-}
-#endif
-
-}
-
+} // namespace logger
 /*
  * Main macros to log
  */
-#define LOG_INF logger::Msg(logger::LogType::Info,    __FILE__, __FUNCTION__, __LINE__)
-#define LOG_WRN logger::Msg(logger::LogType::Warning, __FILE__, __FUNCTION__, __LINE__)
-#define LOG_ERR logger::Msg(logger::LogType::Error,   __FILE__, __FUNCTION__, __LINE__)
-#define LOG_DBG logger::Msg(logger::LogType::Debug,   __FILE__, __FUNCTION__, __LINE__)
+#define LOG_INF logger::Msg(logger::MsgType::Info,    __FILE__, __FUNCTION__, __LINE__)
+#define LOG_WRN logger::Msg(logger::MsgType::Warning, __FILE__, __FUNCTION__, __LINE__)
+#define LOG_ERR logger::Msg(logger::MsgType::Error,   __FILE__, __FUNCTION__, __LINE__)
+#define LOG_DBG logger::Msg(logger::MsgType::Debug,   __FILE__, __FUNCTION__, __LINE__)
 
 #ifdef LOG_FUNCTION_ENTER_EXIT
 #define LOG_FNC logger::FunctionEnterExit lf(__FILE__, __FUNCTION__, __LINE__)
@@ -310,6 +272,6 @@ void logToIvi(const LogType logType, std::string textToLog)
       ...
  * }
  */
-#define CHECK(value, ...) (value ? true : (logger::logMsg(logger::LogType::Error, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__), false))
+#define CHECK(value, ...) (value ? true : (logger::logMsg(logger::MsgType::Error, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__), false))
 
 #endif // NKH_LAB_LOGGER_HPP
