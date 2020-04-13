@@ -1,6 +1,7 @@
-#ifndef NKH_LAB_LOGGER_MSG_TYPE_HPP
-#define NKH_LAB_LOGGER_MSG_TYPE_HPP
+#ifndef NLAB_LOGGER_MSGTYPE_HPP
+#define NLAB_LOGGER_MSGTYPE_HPP
 
+namespace nlab {
 namespace logger {
 
 enum class MsgType
@@ -13,5 +14,7 @@ enum class MsgType
     FuncExit
 };
 
-}
-#endif // NKH_LAB_LOGGER_MSG_TYPE_HPP
+} // namespace logger
+} // namespace nlab
+
+#endif // NLAB_LOGGER_MSGTYPE_HPP

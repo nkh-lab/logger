@@ -21,7 +21,7 @@ int main(void)
     LOG_ERR << "Test Error " << 3;
     LOG_DBG << "Test Debug " << 4;
 
-    logger::logMsg(logger::MsgType::Info, __FUNCTION__, __FILE__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
+    nlab::logger::logMsg(nlab::logger::MsgType::Info, __FUNCTION__, __FILE__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
 
     void* ptr = nullptr;
     if (CHECK(ptr, "ptr = nullptr"))

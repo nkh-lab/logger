@@ -1,5 +1,5 @@
-#ifndef NKH_LAB_LOGGER_HPP
-#define NKH_LAB_LOGGER_HPP
+#ifndef NLAB_LOGGER_HPP
+#define NLAB_LOGGER_HPP
 
 #include "logger-msgtype.hpp"
 
@@ -29,6 +29,7 @@
 #ifndef LOG_OUTPUT_LOGCAT_DISABLED
 #ifdef ANDROID
 #define LOG_OUTPUT_LOGCAT
+#include "logger-logcat.hpp"
 
 #define LOG_OUTPUT_CUSTOM(type, msg) logToLogcat(type, msg)
 #endif
@@ -62,6 +63,7 @@
 #include <thread>
 #endif
 
+namespace nlab {
 namespace logger {
 
 std::mutex gCoutMutex;
@@ -250,16 +252,18 @@ inline std::string toStrFileFunctionLine(const char* fileName, const char* funct
 }
 
 } // namespace logger
+} // namespace nlab
+
 /*
  * Main macros to log
  */
-#define LOG_INF logger::Msg(logger::MsgType::Info,    __FILE__, __FUNCTION__, __LINE__)
-#define LOG_WRN logger::Msg(logger::MsgType::Warning, __FILE__, __FUNCTION__, __LINE__)
-#define LOG_ERR logger::Msg(logger::MsgType::Error,   __FILE__, __FUNCTION__, __LINE__)
-#define LOG_DBG logger::Msg(logger::MsgType::Debug,   __FILE__, __FUNCTION__, __LINE__)
+#define LOG_INF nlab::logger::Msg(nlab::logger::MsgType::Info,    __FILE__, __FUNCTION__, __LINE__)
+#define LOG_WRN nlab::logger::Msg(nlab::logger::MsgType::Warning, __FILE__, __FUNCTION__, __LINE__)
+#define LOG_ERR nlab::logger::Msg(nlab::logger::MsgType::Error,   __FILE__, __FUNCTION__, __LINE__)
+#define LOG_DBG nlab::logger::Msg(nlab::logger::MsgType::Debug,   __FILE__, __FUNCTION__, __LINE__)
 
 #ifdef LOG_FUNCTION_ENTER_EXIT
-#define LOG_FNC logger::FunctionEnterExit lf(__FILE__, __FUNCTION__, __LINE__)
+#define LOG_FNC nlab::logger::FunctionEnterExit lf(__FILE__, __FUNCTION__, __LINE__)
 #else
 #define LOG_FNC
 #endif
@@ -272,6 +276,6 @@ inline std::string toStrFileFunctionLine(const char* fileName, const char* funct
       ...
  * }
  */
-#define CHECK(value, ...) (value ? true : (logger::logMsg(logger::MsgType::Error, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__), false))
+#define CHECK(value, ...) (value ? true : (nlab::logger::logMsg(nlab::logger::MsgType::Error, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__), false))
 
-#endif // NKH_LAB_LOGGER_HPP
+#endif // NLAB_LOGGER_HPP

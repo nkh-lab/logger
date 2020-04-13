@@ -1,11 +1,12 @@
-#ifndef NKH_LAB_LOGGER_IVI_HPP
-#define NKH_LAB_LOGGER_IVI_HPP
+#ifndef NLAB_LOGGER_IVI_HPP
+#define NLAB_LOGGER_IVI_HPP
 
 #include "logger-msgtype.hpp"
 #include "ivi-logging-config.hpp"
 
 #include <string>
 
+namespace nlab {
 namespace logger {
 
 inline void logToIvi(MsgType logType, std::string textToLog)
@@ -39,5 +40,7 @@ inline void logToIvi(MsgType logType, std::string textToLog)
     catch(...){}
 }
 
-}
-#endif // NKH_LAB_LOGGER_IVI_HPP
+} // namespace logger
+} // namespace nlab
+
+#endif // NLAB_LOGGER_IVI_HPP
