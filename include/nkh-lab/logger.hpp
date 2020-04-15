@@ -66,7 +66,7 @@
 namespace nlab {
 namespace logger {
 
-std::mutex gCoutMutex;
+static std::mutex gCoutMutex;
 
 inline const char* getMsgTypeName(MsgType msgType);
 inline const char* getFileNameFromPath(const char* fileFullPath);
@@ -180,7 +180,7 @@ private:
  * Example:
  * logger::logMsg(logger::msgType::Info, __FUNCTION__, __FILE__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
  */
-inline void logMsg(logger::MsgType type, const char* fileFullPath, const char* functionName, size_t line, const char* fmt, ...)
+inline int logMsg(logger::MsgType type, const char* fileFullPath, const char* functionName, size_t line, const char* fmt, ...)
 {
     const int LOG_BUFFER_SIZE = 256;
 
@@ -192,6 +192,8 @@ inline void logMsg(logger::MsgType type, const char* fileFullPath, const char* f
     Msg(type, functionName, getFileNameFromPath(fileFullPath), line) << buffer;
 
     va_end (args);
+
+    return 0; // possible error code, now is used in CHECK to avoid unused expression result
 }
 
 inline const char* getMsgTypeName(MsgType type)
@@ -202,27 +204,27 @@ inline const char* getMsgTypeName(MsgType type)
     {
         default:
         case MsgType::Debug:
-            ret = "LOG_DBG";
+            ret = "[debug]";
             break;
 
         case MsgType::Error:
-            ret = "LOG_ERR";
+            ret = "[error]";
             break;
 
         case MsgType::Info:
-            ret = "LOG_INF";
+            ret = "[info] ";
             break;
 
         case MsgType::Warning:
-            ret = "LOG_WRN";
+            ret = "[warn] ";
             break;
 
         case MsgType::FuncEntry:
-            ret = "LOG_FEN";
+            ret = "[--->] ";
             break;
 
         case MsgType::FuncExit:
-            ret = "LOG_FEX";
+            ret = "[<---] ";
             break;
     }
 
@@ -246,7 +248,7 @@ inline std::string toStrFileFunctionLine(const char* fileName, const char* funct
 {
     std::stringstream streamTolog;
 
-    streamTolog << fileName << ':' << functionName << "():" << line << ':';
+    streamTolog << fileName << ':' << line << " " << functionName << "()";
 
     return streamTolog.str();
 }
@@ -276,6 +278,6 @@ inline std::string toStrFileFunctionLine(const char* fileName, const char* funct
       ...
  * }
  */
-#define CHECK(value, ...) (value ? true : (nlab::logger::logMsg(nlab::logger::MsgType::Error, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__), false))
+#define CHECK(value, ...) (value ? true : (nlab::logger::logMsg(nlab::logger::MsgType::Error, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__) && false))
 
 #endif // NLAB_LOGGER_HPP

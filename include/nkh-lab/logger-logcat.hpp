@@ -14,25 +14,31 @@ inline void logToLogcat(MsgType logType, std::string textToLog)
     switch (logType)
     {
         case MsgType::Debug:
-        case MsgType::FuncEntry:
-        case MsgType::FuncExit:
             ALOGD("%s", textToLog.c_str());
-            break;
+        break;
+
+        case MsgType::FuncEntry:
+            ALOGD("[--->] %s", textToLog.c_str());
+        break;
+
+        case MsgType::FuncExit:
+            ALOGD("[<---] %s", textToLog.c_str());
+        break;
 
         case MsgType::Error:
             ALOGE("%s", textToLog.c_str());
-            break;
+        break;
 
         case MsgType::Info:
             ALOGI("%s", textToLog.c_str());
-            break;
+        break;
 
         case MsgType::Warning:
             ALOGW("%s", textToLog.c_str());
-            break;
+        break;
 
         default:
-            break;
+        break;
     }
 }
 
