@@ -1,7 +1,7 @@
 #ifndef NLAB_LOGGER_LOGCAT_HPP
 #define NLAB_LOGGER_LOGCAT_HPP
 
-#include "logger-msgtype.hpp"
+#include "logger-types.hpp"
 #include "log/log.h"
 
 #include <string>

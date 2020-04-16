@@ -1,6 +1,18 @@
-cc_library_headers {
+cc_library {
     name: "libnkhlablogger",
     vendor_available: true,
+
+    cppflags: [
+        //"-DLOG_FUNCTION_ENTER_EXIT_THREAD_ID",
+    ],
+
+    shared_libs: [
+        "liblog",
+    ],
+
+    local_include_dirs: [ "include/nkh-lab" ],
+
+    srcs: [ "src/*.cpp" ],
 
     export_include_dirs: [ "include" ],
 }
