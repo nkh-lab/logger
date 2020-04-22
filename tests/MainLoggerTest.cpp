@@ -6,6 +6,9 @@ void test1(void);
 void test2(void);
 void main_th(void);
 
+// if use logger like headeronly library
+std::mutex nlab::logger::gCoutMutex;
+
 int main(void)
 {
     LOG_FNC;
