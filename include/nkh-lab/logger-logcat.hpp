@@ -18,11 +18,8 @@ inline void logToLogcat(MsgType logType, std::string textToLog)
         break;
 
         case MsgType::FuncEntry:
-            ALOGD("[--->] %s", textToLog.c_str());
-        break;
-
         case MsgType::FuncExit:
-            ALOGD("[<---] %s", textToLog.c_str());
+            ALOGD("%s%s", getMsgTypeName(logType), textToLog.c_str());
         break;
 
         case MsgType::Error:

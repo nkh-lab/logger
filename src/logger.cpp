@@ -1,4 +1,4 @@
-#include "nkh-lab/logger.hpp"
+#include "nkh-lab/logger-impl.hpp"
 
 #include <mutex>
 

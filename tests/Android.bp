@@ -1,0 +1,22 @@
+cc_binary {
+    name: "LoggerMainTest",
+    vendor: true,
+
+    cppflags: [
+        "-DLOG_TAG=\"LoggerMainTest\"",
+        "-DLOG_FUNCTION_ENTER_EXIT",
+        "-DLOG_FUNCTION_ENTER_EXIT_THREAD_ID",
+    ],
+
+    header_libs: [
+        "libnkhlablogger_headers",
+    ],
+
+    shared_libs: [
+        "liblog",
+    ],
+
+    srcs: [
+        "LoggerMainTest.cpp"
+    ],
+}

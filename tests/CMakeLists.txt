@@ -10,14 +10,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 add_definitions(-DLOG_FUNCTION_ENTER_EXIT)
 add_definitions(-DLOG_FUNCTION_ENTER_EXIT_THREAD_ID)
 
-project(MainLoggerTest CXX)
+project(LoggerMainTest CXX)
 
 find_package (Threads)
 
 include_directories("../include")
 
 file(GLOB SRC_FILES
-    "MainLoggerTest.cpp"
+    "LoggerMainTest.cpp"
 )
 
 include_directories(../include)

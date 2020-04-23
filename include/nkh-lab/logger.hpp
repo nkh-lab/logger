@@ -1,7 +1,7 @@
 #ifndef NLAB_LOGGER_HPP
 #define NLAB_LOGGER_HPP
 
-#include "logger-types.hpp"
+#include "logger-impl.hpp"
 
 /*
  * Main macros to log

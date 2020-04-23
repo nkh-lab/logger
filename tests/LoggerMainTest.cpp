@@ -1,6 +1,6 @@
-#include <thread>
-
 #include "nkh-lab/logger.hpp"
+
+#include <thread>
 
 void test1(void);
 void test2(void);
@@ -24,7 +24,7 @@ int main(void)
     LOG_ERR << "Test Error " << 3;
     LOG_DBG << "Test Debug " << 4;
 
-    nlab::logger::logMsg(nlab::logger::MsgType::Info, __FUNCTION__, __FILE__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
+    nlab::logger::logMsg(nlab::logger::MsgType::Info, __FILE__, __FUNCTION__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
 
     void* ptr = nullptr;
     if (CHECK(ptr, "ptr = nullptr"))
