@@ -10,6 +10,10 @@
 #include <stdarg.h>
 #include <string.h>
 
+#ifdef __linux__
+#include <sys/time.h>
+#endif
+
 /*
  * Outputs: COUT or CUSTOM: Android Logcat, FILE, ...
  *
@@ -44,6 +48,7 @@ extern std::mutex gCoutMutex;
 
 inline const char* getFileNameFromPath(const char* fileFullPath);
 inline std::string toStrFileFunctionLine(const char* fileName, const char* functionName, size_t line);
+inline std::string getTimeStamp();
 
 class Msg
 {
@@ -71,7 +76,7 @@ public:
         #ifdef LOG_OUTPUT_COUT
             {
                 std::lock_guard<std::mutex> lock(gCoutMutex);
-                std::cout << getMsgTypeName(mType) << " " << mStreamTolog.str() << std::endl;
+                std::cout << getTimeStamp() << " " << getMsgTypeName(mType) << " " << mStreamTolog.str() << std::endl;
             }
         #endif
 
@@ -115,7 +120,7 @@ public:
     #ifdef LOG_OUTPUT_COUT
         {
             std::lock_guard<std::mutex> lock(gCoutMutex);
-            std::cout << getMsgTypeName(MsgType::FuncEntry) << " " << mStreamTolog.str() << std::endl;
+            std::cout << getTimeStamp() << " " << getMsgTypeName(MsgType::FuncEntry) << " " << mStreamTolog.str() << std::endl;
         }
     #endif
 
@@ -135,7 +140,7 @@ public:
     #ifdef LOG_OUTPUT_COUT
         {
             std::lock_guard<std::mutex> lock(gCoutMutex);
-            std::cout << getMsgTypeName(MsgType::FuncExit) << " " << mStreamTolog.str() << std::endl;
+            std::cout << getTimeStamp() << " " << getMsgTypeName(MsgType::FuncExit) << " " << mStreamTolog.str() << std::endl;
         }
     #endif
 
@@ -184,6 +189,30 @@ inline std::string toStrFileFunctionLine(const char* fileName, const char* funct
     streamTolog << fileName << ':' << line << " " << functionName << "()";
 
     return streamTolog.str();
+}
+
+inline std::string getTimeStampLinux()
+{
+    char fmt[32];
+    char buf[32];
+    timeval tv;
+    tm *tm;
+
+    gettimeofday (&tv, NULL);
+    tm = localtime (&tv.tv_sec);
+    strftime (fmt, sizeof (fmt), "%m-%d %H:%M:%S.%%03u", tm);
+    snprintf (buf, sizeof (buf), fmt, tv.tv_usec/1000);
+
+    return std::string(buf);
+}
+
+inline std::string getTimeStamp()
+{
+#ifdef __linux__
+    return getTimeStampLinux();
+#else
+    return {};
+#endif
 }
 
 } // namespace logger
