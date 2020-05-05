@@ -1,8 +1,8 @@
 # logger
 To trace and debug a source code.
 
-# Headeronly library
-In this case next variable should be define:
+# Header only library
+In this case next variable should be defined:
 ```
 std::mutex nlab::logger::gCoutMutex;
 ```
