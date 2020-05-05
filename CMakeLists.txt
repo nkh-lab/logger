@@ -20,5 +20,5 @@ file(GLOB SRC_FILES
     "src/*.hpp"
 )
 
-add_library(${CMAKE_PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} SHARED
             ${SRC_FILES})
