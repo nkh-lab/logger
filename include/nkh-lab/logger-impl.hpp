@@ -25,7 +25,7 @@
 #endif
 
 #ifndef LOG_OUTPUT_LOGCAT_DISABLED
-#ifdef ANDROID
+#if defined ANDROID || defined __ANDROID__
 #define LOG_OUTPUT_LOGCAT
 #include "logger-logcat.hpp"
 
