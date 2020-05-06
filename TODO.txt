@@ -1,9 +1,0 @@
-- Think about time stamap for COUT.
-
-- Boost like out for COUT: 
-2020-04-13 12:13:42.233605 [error] application_impl::invoke_handler caught exception: std::exception
-2020-04-13 12:13:42.234105 [warning] BLOCKING CALL MESSAGE(0102): [1234.5678.80f2:0022]
-2020-04-13 12:13:42.443987 [error] application_impl::invoke_handler caught exception: std::exception
-2020-04-13 12:13:42.444234 [warning] BLOCKING CALL MESSAGE(0102): [1234.5678.80f2:0023]
-
-- Use template for MsgType.

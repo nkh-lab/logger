@@ -22,8 +22,8 @@ file(GLOB SRC_FILES
 
 include_directories(../include)
 
-add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES})
+add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-target_link_libraries (${CMAKE_PROJECT_NAME}
+target_link_libraries (${PROJECT_NAME}
 #    ${PROJECT_SOURCE_DIR}/../build/libnkhlablogger.so
     ${CMAKE_THREAD_LIBS_INIT})
