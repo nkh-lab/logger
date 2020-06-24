@@ -21,6 +21,7 @@ add_library(${PROJECT_NAME} SHARED
 
 if(ANDROID)
     find_library(ANDROID_LOG_LIB log)
-    target_link_libraries(${PROJECT_NAME} PUBLIC ${ANDROID_LOG_LIB})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${ANDROID_LOG_LIB})
 endif()
 
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
