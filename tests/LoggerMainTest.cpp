@@ -7,7 +7,9 @@ void test2(void);
 void main_th(void);
 
 // if use logger like headeronly library
+#ifdef BUILD_HEADER_LIB
 std::mutex nlab::logger::gCoutMutex;
+#endif
 
 int main(void)
 {

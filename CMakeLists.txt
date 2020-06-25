@@ -9,6 +9,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 project(nkhlablogger CXX)
 
+option(BUILD_HEADER_LIB "Build the header only library" OFF)
+
 include_directories("include")
 
 file(GLOB SRC_FILES
@@ -16,12 +18,18 @@ file(GLOB SRC_FILES
     "src/*.hpp"
 )
 
-add_library(${PROJECT_NAME} SHARED
+if(BUILD_HEADER_LIB)
+    add_library(${PROJECT_NAME} INTERFACE)
+    target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+else()
+    add_library(${PROJECT_NAME} SHARED
             ${SRC_FILES})
+    target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+endif()
 
 if(ANDROID)
     find_library(ANDROID_LOG_LIB log)
     target_link_libraries(${PROJECT_NAME} PRIVATE ${ANDROID_LOG_LIB})
+else()
+    add_subdirectory(tests EXCLUDE_FROM_ALL)
 endif()
-
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
