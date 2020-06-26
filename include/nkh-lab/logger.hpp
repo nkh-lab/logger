@@ -3,6 +3,8 @@
 
 #include "logger-impl.hpp"
 
+// clang-format off
+
 /*
  * Main macros to log
  */
@@ -18,5 +20,7 @@
 #endif
 
 #define CHECK(value, ...) (value ? true : (nlab::logger::logMsg(nlab::logger::MsgType::Error, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__) && false))
+
+// clang-format on
 
 #endif // NLAB_LOGGER_HPP

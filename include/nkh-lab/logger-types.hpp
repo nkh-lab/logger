@@ -20,30 +20,30 @@ inline const char* getMsgTypeName(MsgType type)
 
     switch (type)
     {
-        default:
-        case MsgType::Debug:
-            ret = "[debug]";
-            break;
+    default:
+    case MsgType::Debug:
+        ret = "[debug]";
+        break;
 
-        case MsgType::Error:
-            ret = "[error]";
-            break;
+    case MsgType::Error:
+        ret = "[error]";
+        break;
 
-        case MsgType::Info:
-            ret = "[info] ";
-            break;
+    case MsgType::Info:
+        ret = "[info] ";
+        break;
 
-        case MsgType::Warning:
-            ret = "[warn] ";
-            break;
+    case MsgType::Warning:
+        ret = "[warn] ";
+        break;
 
-        case MsgType::FuncEntry:
-            ret = "[--->] ";
-            break;
+    case MsgType::FuncEntry:
+        ret = "[--->] ";
+        break;
 
-        case MsgType::FuncExit:
-            ret = "[<---] ";
-            break;
+    case MsgType::FuncExit:
+        ret = "[<---] ";
+        break;
     }
 
     return ret;

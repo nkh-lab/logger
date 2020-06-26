@@ -53,17 +53,17 @@ inline std::string getTimeStamp();
 class Msg
 {
 public:
-    Msg(MsgType type, const char* fileFullPath, const char* functionName, size_t line) :
-        mType(type)
+    Msg(MsgType type, const char* fileFullPath, const char* functionName, size_t line)
+        : mType(type)
     {
         if (isAllowedToLog())
-            mStreamTolog << toStrFileFunctionLine(getFileNameFromPath(fileFullPath), functionName, line) << " ";
+            mStreamTolog << toStrFileFunctionLine(getFileNameFromPath(fileFullPath), functionName, line)
+                         << " ";
     };
 
     // disallow copying
     Msg(const Msg&) = delete;
     Msg& operator=(const Msg&) = delete;
-
 
     // disallow moving
     Msg(Msg&&) = delete;
@@ -73,19 +73,20 @@ public:
     {
         if (isAllowedToLog())
         {
-        #ifdef LOG_OUTPUT_COUT
+#ifdef LOG_OUTPUT_COUT
             {
                 std::lock_guard<std::mutex> lock(gCoutMutex);
-                std::cout << getTimeStamp() << " " << getMsgTypeName(mType) << " " << mStreamTolog.str() << std::endl;
+                std::cout << getTimeStamp() << " " << getMsgTypeName(mType) << " "
+                          << mStreamTolog.str() << std::endl;
             }
-        #endif
+#endif
 
             LOG_OUTPUT_CUSTOM(mType, mStreamTolog.str());
-       }
+        }
     };
 
-    template<typename T>
-    Msg& operator << (const T& p)
+    template <typename T>
+    Msg& operator<<(const T& p)
     {
         if (isAllowedToLog()) mStreamTolog << p;
 
@@ -95,9 +96,9 @@ public:
 private:
     bool isAllowedToLog()
     {
-    #ifdef LOG_DEBUG_MESSAGES
+#ifdef LOG_DEBUG_MESSAGES
         if (mType == MsgType::Debug) return false;
-    #endif
+#endif
         return true;
     };
 
@@ -113,16 +114,17 @@ public:
     {
         mStreamTolog << toStrFileFunctionLine(getFileNameFromPath(fileFullPath), functionName, line);
 
-    #ifdef LOG_FUNCTION_ENTER_EXIT_THREAD_ID
+#ifdef LOG_FUNCTION_ENTER_EXIT_THREAD_ID
         mStreamTolog << " ThreadId: " << std::this_thread::get_id();
-    #endif
+#endif
 
-    #ifdef LOG_OUTPUT_COUT
+#ifdef LOG_OUTPUT_COUT
         {
             std::lock_guard<std::mutex> lock(gCoutMutex);
-            std::cout << getTimeStamp() << " " << getMsgTypeName(MsgType::FuncEntry) << " " << mStreamTolog.str() << std::endl;
+            std::cout << getTimeStamp() << " " << getMsgTypeName(MsgType::FuncEntry) << " "
+                      << mStreamTolog.str() << std::endl;
         }
-    #endif
+#endif
 
         LOG_OUTPUT_CUSTOM(MsgType::FuncEntry, mStreamTolog.str());
     };
@@ -137,12 +139,13 @@ public:
 
     ~FunctionEnterExit()
     {
-    #ifdef LOG_OUTPUT_COUT
+#ifdef LOG_OUTPUT_COUT
         {
             std::lock_guard<std::mutex> lock(gCoutMutex);
-            std::cout << getTimeStamp() << " " << getMsgTypeName(MsgType::FuncExit) << " " << mStreamTolog.str() << std::endl;
+            std::cout << getTimeStamp() << " " << getMsgTypeName(MsgType::FuncExit) << " "
+                      << mStreamTolog.str() << std::endl;
         }
-    #endif
+#endif
 
         LOG_OUTPUT_CUSTOM(MsgType::FuncExit, mStreamTolog.str());
     };
@@ -156,18 +159,24 @@ private:
  * Example:
  * logger::logMsg(logger::msgType::Info, __FUNCTION__, __FILE__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
  */
-inline int logMsg(logger::MsgType type, const char* fileFullPath, const char* functionName, size_t line, const char* fmt, ...)
+inline int logMsg(
+    logger::MsgType type,
+    const char* fileFullPath,
+    const char* functionName,
+    size_t line,
+    const char* fmt,
+    ...)
 {
     const int LOG_BUFFER_SIZE = 256;
 
     char buffer[LOG_BUFFER_SIZE];
     va_list args;
-    va_start (args, fmt);
-    vsnprintf (buffer, LOG_BUFFER_SIZE - 1, fmt, args);
+    va_start(args, fmt);
+    vsnprintf(buffer, LOG_BUFFER_SIZE - 1, fmt, args);
 
     Msg(type, fileFullPath, functionName, line) << buffer;
 
-    va_end (args);
+    va_end(args);
 
     return 0; // possible error code, now is used in CHECK to avoid unused expression result
 }
@@ -176,8 +185,10 @@ inline const char* getFileNameFromPath(const char* fileFullPath)
 {
     const char* ret = strrchr(fileFullPath, '/');
 
-    if (ret) ++ret;
-    else ret = fileFullPath;
+    if (ret)
+        ++ret;
+    else
+        ret = fileFullPath;
 
     return ret;
 }
@@ -196,12 +207,12 @@ inline std::string getTimeStampLinux()
     char fmt[32];
     char buf[32];
     timeval tv;
-    tm *tm;
+    tm* tm;
 
-    gettimeofday (&tv, NULL);
-    tm = localtime (&tv.tv_sec);
-    strftime (fmt, sizeof (fmt), "%m-%d %H:%M:%S.%%03u", tm);
-    snprintf (buf, sizeof (buf), fmt, tv.tv_usec/1000);
+    gettimeofday(&tv, NULL);
+    tm = localtime(&tv.tv_sec);
+    strftime(fmt, sizeof(fmt), "%m-%d %H:%M:%S.%%03u", tm);
+    snprintf(buf, sizeof(buf), fmt, tv.tv_usec / 1000);
 
     return std::string(buf);
 }
