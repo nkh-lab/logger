@@ -49,6 +49,7 @@ extern std::mutex gCoutMutex;
 inline const char* getFileNameFromPath(const char* fileFullPath);
 inline std::string toStrFileFunctionLine(const char* fileName, const char* functionName, size_t line);
 inline std::string getTimeStamp();
+inline bool isAllowedToLog(MsgType type);
 
 class Msg
 {
@@ -56,7 +57,7 @@ public:
     Msg(MsgType type, const char* fileFullPath, const char* functionName, size_t line)
         : mType(type)
     {
-        if (isAllowedToLog())
+        if (isAllowedToLog(mType))
             mStreamTolog << toStrFileFunctionLine(getFileNameFromPath(fileFullPath), functionName, line)
                          << " ";
     };
@@ -71,7 +72,7 @@ public:
 
     ~Msg()
     {
-        if (isAllowedToLog())
+        if (isAllowedToLog(mType))
         {
 #ifdef LOG_OUTPUT_COUT
             {
@@ -88,19 +89,10 @@ public:
     template <typename T>
     Msg& operator<<(const T& p)
     {
-        if (isAllowedToLog()) mStreamTolog << p;
+        if (isAllowedToLog(mType)) mStreamTolog << p;
 
         return *this;
     }
-
-private:
-    bool isAllowedToLog()
-    {
-#ifdef LOG_DEBUG_MESSAGES
-        if (mType == MsgType::Debug) return false;
-#endif
-        return true;
-    };
 
 private:
     MsgType mType;
@@ -112,21 +104,25 @@ class FunctionEnterExit
 public:
     FunctionEnterExit(const char* fileFullPath, const char* functionName, size_t line)
     {
-        mStreamTolog << toStrFileFunctionLine(getFileNameFromPath(fileFullPath), functionName, line);
+        if (isAllowedToLog(MsgType::FuncEntry))
+        {
+            mStreamTolog << toStrFileFunctionLine(
+                getFileNameFromPath(fileFullPath), functionName, line);
 
 #ifdef LOG_FUNCTION_ENTER_EXIT_THREAD_ID
-        mStreamTolog << " ThreadId: " << std::this_thread::get_id();
+            mStreamTolog << " ThreadId: " << std::this_thread::get_id();
 #endif
 
 #ifdef LOG_OUTPUT_COUT
-        {
-            std::lock_guard<std::mutex> lock(gCoutMutex);
-            std::cout << getTimeStamp() << " " << getMsgTypeName(MsgType::FuncEntry) << " "
-                      << mStreamTolog.str() << std::endl;
-        }
+            {
+                std::lock_guard<std::mutex> lock(gCoutMutex);
+                std::cout << getTimeStamp() << " " << getMsgTypeName(MsgType::FuncEntry) << " "
+                          << mStreamTolog.str() << std::endl;
+            }
 #endif
 
-        LOG_OUTPUT_CUSTOM(MsgType::FuncEntry, mStreamTolog.str());
+            LOG_OUTPUT_CUSTOM(MsgType::FuncEntry, mStreamTolog.str());
+        }
     };
 
     // disallow copying
@@ -139,15 +135,18 @@ public:
 
     ~FunctionEnterExit()
     {
-#ifdef LOG_OUTPUT_COUT
+        if (isAllowedToLog(MsgType::FuncExit))
         {
-            std::lock_guard<std::mutex> lock(gCoutMutex);
-            std::cout << getTimeStamp() << " " << getMsgTypeName(MsgType::FuncExit) << " "
-                      << mStreamTolog.str() << std::endl;
-        }
+#ifdef LOG_OUTPUT_COUT
+            {
+                std::lock_guard<std::mutex> lock(gCoutMutex);
+                std::cout << getTimeStamp() << " " << getMsgTypeName(MsgType::FuncExit) << " "
+                          << mStreamTolog.str() << std::endl;
+            }
 #endif
 
-        LOG_OUTPUT_CUSTOM(MsgType::FuncExit, mStreamTolog.str());
+            LOG_OUTPUT_CUSTOM(MsgType::FuncExit, mStreamTolog.str());
+        }
     };
 
 private:
@@ -225,6 +224,19 @@ inline std::string getTimeStamp()
     return {};
 #endif
 }
+
+inline bool isAllowedToLog(MsgType type)
+{
+#if defined NDEBUG
+    if (type == MsgType::Debug || type == MsgType::FuncEntry || type == MsgType::FuncExit)
+        return false;
+    else
+        return true;
+#else
+    (void)type;
+    return true;
+#endif
+};
 
 } // namespace logger
 } // namespace nlab
