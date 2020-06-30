@@ -14,7 +14,8 @@ enum class MsgType
     FuncExit
 };
 
-inline const char* getMsgTypeName(MsgType type)
+template <MsgType type>
+inline const char* getMsgTypeName()
 {
     const char* ret;
 

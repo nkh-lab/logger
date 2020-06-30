@@ -29,7 +29,7 @@
 #define LOG_OUTPUT_LOGCAT
 #include "logger-logcat.hpp"
 
-#define LOG_OUTPUT_CUSTOM(type, msg) logToLogcat(type, msg)
+#define LOG_OUTPUT_CUSTOM(type, msg) logToLogcat<type>(msg)
 #endif
 #endif
 
@@ -49,15 +49,27 @@ extern std::mutex gCoutMutex;
 inline const char* getFileNameFromPath(const char* fileFullPath);
 inline std::string toStrFileFunctionLine(const char* fileName, const char* functionName, size_t line);
 inline std::string getTimeStamp();
-inline bool isAllowedToLog(MsgType type);
 
+template <MsgType type>
+constexpr bool isAllowedToLog()
+{
+#if defined NDEBUG
+    if (type == MsgType::Debug || type == MsgType::FuncEntry || type == MsgType::FuncExit)
+        return false;
+    else
+        return true;
+#else
+    return true;
+#endif
+};
+
+template <MsgType type>
 class Msg
 {
 public:
-    Msg(MsgType type, const char* fileFullPath, const char* functionName, size_t line)
-        : mType(type)
+    Msg(const char* fileFullPath, const char* functionName, size_t line)
     {
-        if (isAllowedToLog(mType))
+        if (isAllowedToLog<type>())
             mStreamTolog << toStrFileFunctionLine(getFileNameFromPath(fileFullPath), functionName, line)
                          << " ";
     };
@@ -72,30 +84,29 @@ public:
 
     ~Msg()
     {
-        if (isAllowedToLog(mType))
+        if (isAllowedToLog<type>())
         {
 #ifdef LOG_OUTPUT_COUT
             {
                 std::lock_guard<std::mutex> lock(gCoutMutex);
-                std::cout << getTimeStamp() << " " << getMsgTypeName(mType) << " "
+                std::cout << getTimeStamp() << " " << getMsgTypeName<type>() << " "
                           << mStreamTolog.str() << std::endl;
             }
 #endif
 
-            LOG_OUTPUT_CUSTOM(mType, mStreamTolog.str());
+            LOG_OUTPUT_CUSTOM(type, mStreamTolog.str());
         }
     };
 
     template <typename T>
     Msg& operator<<(const T& p)
     {
-        if (isAllowedToLog(mType)) mStreamTolog << p;
+        if (isAllowedToLog<type>()) mStreamTolog << p;
 
         return *this;
     }
 
 private:
-    MsgType mType;
     std::stringstream mStreamTolog;
 };
 
@@ -104,7 +115,7 @@ class FunctionEnterExit
 public:
     FunctionEnterExit(const char* fileFullPath, const char* functionName, size_t line)
     {
-        if (isAllowedToLog(MsgType::FuncEntry))
+        if (isAllowedToLog<MsgType::FuncEntry>())
         {
             mStreamTolog << toStrFileFunctionLine(
                 getFileNameFromPath(fileFullPath), functionName, line);
@@ -116,7 +127,7 @@ public:
 #ifdef LOG_OUTPUT_COUT
             {
                 std::lock_guard<std::mutex> lock(gCoutMutex);
-                std::cout << getTimeStamp() << " " << getMsgTypeName(MsgType::FuncEntry) << " "
+                std::cout << getTimeStamp() << " " << getMsgTypeName<MsgType::FuncEntry>() << " "
                           << mStreamTolog.str() << std::endl;
             }
 #endif
@@ -135,12 +146,12 @@ public:
 
     ~FunctionEnterExit()
     {
-        if (isAllowedToLog(MsgType::FuncExit))
+        if (isAllowedToLog<MsgType::FuncExit>())
         {
 #ifdef LOG_OUTPUT_COUT
             {
                 std::lock_guard<std::mutex> lock(gCoutMutex);
-                std::cout << getTimeStamp() << " " << getMsgTypeName(MsgType::FuncExit) << " "
+                std::cout << getTimeStamp() << " " << getMsgTypeName<MsgType::FuncExit>() << " "
                           << mStreamTolog.str() << std::endl;
             }
 #endif
@@ -156,15 +167,10 @@ private:
 /* To log format string messages
  *
  * Example:
- * logger::logMsg(logger::msgType::Info, __FUNCTION__, __FILE__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
+ * logger::logMsg<logger::msgType::Info>(__FUNCTION__, __FILE__, __LINE__, "Test %d %s %c", 888, "str", 'c' );
  */
-inline int logMsg(
-    logger::MsgType type,
-    const char* fileFullPath,
-    const char* functionName,
-    size_t line,
-    const char* fmt,
-    ...)
+template <MsgType type>
+inline int logMsg(const char* fileFullPath, const char* functionName, size_t line, const char* fmt, ...)
 {
     const int LOG_BUFFER_SIZE = 256;
 
@@ -173,7 +179,7 @@ inline int logMsg(
     va_start(args, fmt);
     vsnprintf(buffer, LOG_BUFFER_SIZE - 1, fmt, args);
 
-    Msg(type, fileFullPath, functionName, line) << buffer;
+    Msg<type>(fileFullPath, functionName, line) << buffer;
 
     va_end(args);
 
@@ -224,19 +230,6 @@ inline std::string getTimeStamp()
     return {};
 #endif
 }
-
-inline bool isAllowedToLog(MsgType type)
-{
-#if defined NDEBUG
-    if (type == MsgType::Debug || type == MsgType::FuncEntry || type == MsgType::FuncExit)
-        return false;
-    else
-        return true;
-#else
-    (void)type;
-    return true;
-#endif
-};
 
 } // namespace logger
 } // namespace nlab

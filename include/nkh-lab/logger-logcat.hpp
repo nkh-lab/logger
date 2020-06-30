@@ -13,9 +13,10 @@
 namespace nlab {
 namespace logger {
 
-inline void logToLogcat(MsgType logType, std::string textToLog)
+template <MsgType type>
+inline void logToLogcat(std::string textToLog)
 {
-    switch (logType)
+    switch (type)
     {
     case MsgType::Debug:
         (void)__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, "%s", textToLog.c_str());
@@ -24,7 +25,7 @@ inline void logToLogcat(MsgType logType, std::string textToLog)
     case MsgType::FuncEntry:
     case MsgType::FuncExit:
         (void)__android_log_print(
-            ANDROID_LOG_DEBUG, LOG_TAG, "%s%s", getMsgTypeName(logType), textToLog.c_str());
+            ANDROID_LOG_DEBUG, LOG_TAG, "%s%s", getMsgTypeName<type>(), textToLog.c_str());
         break;
 
     case MsgType::Error:
