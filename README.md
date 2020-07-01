@@ -1,7 +1,7 @@
 # logger
 Utility library for source code tracing and debugging.
 
-Could be used like header only or shared library.
+Could be used like interface (header only) or shared library.
 
 ## Supported build systems and OSs
 - CMake: Linux, Android NDK
@@ -14,11 +14,13 @@ Could be used like header only or shared library.
 ## Usage
 Both usage examples (header only or shared library) can be found in tests/LoggerMainTest.
 
-### Header only library notes
-1. Define next variable in your code:
+### Interface (header only) library notes
+1. Define next variable in your code if cout output is used (it needs for output synchronization):
 ```
 std::mutex nlab::logger::gCoutMutex;
 ```
+If not, switch off cout logging via next define: LOG_OUTPUT_COUT_DISABLED
+
 2. Define CMake option BUILD_HEADER_LIB=ON and build, e.g:
 ```
 cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_HEADER_LIB=ON ..

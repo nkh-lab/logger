@@ -6,7 +6,7 @@ void test1(void);
 void test2(void);
 void main_th(void);
 
-// if use logger like headeronly library
+// if use logger like interface (header only) library
 #ifdef BUILD_HEADER_LIB
 std::mutex nlab::logger::gCoutMutex;
 #endif
