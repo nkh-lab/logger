@@ -17,12 +17,9 @@
 /*
  * Outputs: COUT or CUSTOM: Android Logcat, FILE, ...
  *
- *  - LOG_OUTPUT_COUT   - ON  by default
- *  - LOG_OUTPUT_LOGCAT - ON  by default for ANDROID build
+ *  - LOG_OUTPUT_COUT   - ON  by default except Android NDK build
+ *  - LOG_OUTPUT_LOGCAT - ON  by default for Android (AOSP and NDK) build
  */
-#ifndef LOG_OUTPUT_COUT_DISABLED
-#define LOG_OUTPUT_COUT
-#endif
 
 #ifndef LOG_OUTPUT_LOGCAT_DISABLED
 #if defined ANDROID || defined __ANDROID__
@@ -30,7 +27,16 @@
 #include "logger-logcat.hpp"
 
 #define LOG_OUTPUT_CUSTOM(type, msg) logToLogcat<type>(msg)
+
+#if defined ANDROID // NDK
+#define LOG_OUTPUT_COUT_DISABLED
 #endif
+
+#endif
+#endif
+
+#ifndef LOG_OUTPUT_COUT_DISABLED
+#define LOG_OUTPUT_COUT
 #endif
 
 #ifndef LOG_OUTPUT_CUSTOM

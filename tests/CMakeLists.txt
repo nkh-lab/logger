@@ -4,7 +4,7 @@ project(LoggerMainTest CXX)
 
 add_definitions(-DLOG_FUNCTION_ENTER_EXIT_THREAD_ID)
 
-if(BUILD_HEADER_LIB)
+if(LOGGER_BUILD_HEADER_LIB)
     add_definitions(-DBUILD_HEADER_LIB)
 endif()
 

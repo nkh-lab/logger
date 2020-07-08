@@ -21,9 +21,9 @@ std::mutex nlab::logger::gCoutMutex;
 ```
 If not, switch off cout logging via next define: LOG_OUTPUT_COUT_DISABLED
 
-2. Define CMake option BUILD_HEADER_LIB=ON and build, e.g:
+2. Define CMake option LOGGER_BUILD_HEADER_LIB=ON and build, e.g:
 ```
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_HEADER_LIB=ON ..
+cmake -DCMAKE_BUILD_TYPE=Release -DLOGGER_BUILD_HEADER_LIB=ON ..
 ```
 
 ## Example outputs
