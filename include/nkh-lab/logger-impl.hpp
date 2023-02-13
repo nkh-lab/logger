@@ -213,6 +213,7 @@ inline std::string toStrFileFunctionLine(const char* fileName, const char* funct
     return streamTolog.str();
 }
 
+#ifdef __linux__
 inline std::string getTimeStampLinux()
 {
     char fmt[32];
@@ -227,6 +228,7 @@ inline std::string getTimeStampLinux()
 
     return std::string(buf);
 }
+#endif
 
 inline std::string getTimeStamp()
 {
