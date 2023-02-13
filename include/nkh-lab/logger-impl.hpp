@@ -17,7 +17,7 @@
 /*
  * Outputs: COUT or CUSTOM: Android Logcat, FILE, ...
  *
- *  - LOG_OUTPUT_COUT   - ON  by default except Android NDK build
+ *  - LOG_OUTPUT_COUT   - ON  by default except Android (AOSP and NDK) build
  *  - LOG_OUTPUT_LOGCAT - ON  by default for Android (AOSP and NDK) build
  */
 
